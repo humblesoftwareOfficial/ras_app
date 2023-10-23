@@ -22,7 +22,8 @@ export default function DefaultInput({
   prefix = "",
   maxLength = 250,
   topPrefix = 19,
-  customTextAlign = "center"
+  customTextAlign = "center",
+  backgroundColor = "#FFF",
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -38,6 +39,7 @@ export default function DefaultInput({
             borderColor: hasError ? "red" : borderColor,
             borderWidth: hasError ? 1 : 0.9,
             color: editable ? "#000" : "gray",
+            backgroundColor,
           },
           { paddingRight: isPassword ? 40 : 15 },
           { height: multiLine ? 90 : 40 },
@@ -101,7 +103,6 @@ const styles = StyleSheet.create({
     // borderWidth: 0.9,
     padding: 10,
     borderRadius: 5,
-    backgroundColor: "#FFF",
   },
   iconPassword: {
     position: "absolute",

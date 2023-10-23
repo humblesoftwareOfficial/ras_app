@@ -8,6 +8,7 @@ import FilterServiceCard from "../cards/services";
 import { RefreshControl } from "react-native";
 import ItemApplication from "../cards/applications/ItemApplication";
 import { EApplicationStatus } from "../../utils/system";
+import { View } from "react-native";
 
 const DATA = [
   {
@@ -139,7 +140,7 @@ export default function ApplicationsList({}) {
         <FullLoadingContainer />
       ) : (
         <FlatList
-          style={{ backgroundColor: APP_COLORS.LIGHT_COLOR.color, flex: 1, marginTop: 10, }}
+          style={{ backgroundColor: APP_COLORS.LIGHT_COLOR.color, flex: 1, marginTop: 1, }}
           disableIntervalMomentum
           data={data || []}
           renderItem={renderItems}
@@ -172,6 +173,9 @@ export default function ApplicationsList({}) {
               />
             )
           }
+          ListHeaderComponent={<View style={{ marginTop: 10}}>
+
+          </View>}
         />
       )}
     </>

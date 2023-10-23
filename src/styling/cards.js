@@ -51,6 +51,7 @@ export const ITEM_APPLICATION_CARD_STYLE = StyleSheet.create({
   },
   status_text: {
     fontFamily: FONTS.bold,
+    fontSize: 7
   },
 
 
@@ -58,15 +59,15 @@ export const ITEM_APPLICATION_CARD_STYLE = StyleSheet.create({
     flex: 1,
   },
   right: {
-    flex: 2.5,
+    flex: 5,
   },
   service: {
     height: ITEM_HEIGHT,
     justifyContent: "center",
     borderRightWidth: 2,
     backgroundColor: APP_COLORS.WHITE_COLOR.color,
-    borderTopRightRadius: 50,
-    borderBottomRightRadius: 50,
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
   },
   service_name: {
     marginLeft: 5,
@@ -75,8 +76,8 @@ export const ITEM_APPLICATION_CARD_STYLE = StyleSheet.create({
     fontSize: 16
   },
   status: {
-    borderTopLeftRadius: 50,
-    borderBottomLeftRadius: 50,
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
     // width: ITEM_HEIGHT,
     height: ITEM_HEIGHT,
     justifyContent: "center",
