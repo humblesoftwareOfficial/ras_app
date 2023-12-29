@@ -1,183 +1,153 @@
-import React, { useCallback, useState } from "react";
-import { FlatList } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { FlatList, Text } from "react-native";
 import { ActivityIndicator } from "react-native";
 
 import FullLoadingContainer from "../loaders/FullLoadingContainer";
 import { APP_COLORS } from "../../styling/colors";
-import FilterServiceCard from "../cards/services";
+
 import { RefreshControl } from "react-native";
 import ItemApplication from "../cards/applications/ItemApplication";
 import { EApplicationStatus } from "../../utils/system";
 import { View } from "react-native";
+import Services from "../../screens/Home/Dashboard/Services";
+import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
+import { GetInstances } from "../../api";
+import { generateKey } from "../../utils";
 
-const DATA = [
-  {
-    code: 1,
-    service: "Corporate",
-    label: "Oracle",
-    status: EApplicationStatus.success
-  },
-  {
-    code: 2,
-    service: "Customer care",
-    label: "Sugu",
-    status: EApplicationStatus.success
-  },
-  {
-    code: 3,
-    service: "Corporate",
-    label: "Oracle",
-    status: EApplicationStatus["service-failure"]
-  },
-  {
-    code: 4,
-    service: "Customer care",
-    label: "Sugu",
-    status: EApplicationStatus["internal-failure"]
-  },
-  {
-    code: 5,
-    service: "Corporate",
-    label: "Oracle",
-    status: EApplicationStatus.success
-  },
-  {
-    code: 6,
-    service: "Customer care",
-    label: "Sugu",
-    status: EApplicationStatus.success
-  },
-  {
-    code: 7,
-    service: "Corporate",
-    label: "Oracle",
-    status: EApplicationStatus.success
-  },
-  {
-    code: 8,
-    service: "Customer care",
-    label: "Sugu",
-    status: EApplicationStatus.success
-  },
-  {
-    code: 9,
-    service: "Corporate",
-    label: "Oracle",
-    status: EApplicationStatus["service-failure"]
-  },
-  {
-    code: 10,
-    service: "Customer care",
-    label: "Sugu",
-    status: EApplicationStatus["internal-failure"]
-  },
-  {
-    code: 11,
-    service: "Corporate",
-    label: "Oracle",
-    status: EApplicationStatus.success
-  },
-  {
-    code: 12,
-    service: "Customer care",
-    label: "Sugu",
-    status: EApplicationStatus.success
-  },
-];
 
-export default function ApplicationsList({}) {
+export default function ApplicationsList({ navigation, services = [] }) {
   const [isLoading, setIsLoading] = useState(false);
-  const [data, setData] = useState(DATA);
-  const [isRetreivingData, setIsRetreivingData] = useState(false);
+  const [data, setData] = useState(null);
+  const [isRetrievingData, setIsRetrievingData] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [
     onEndReachedCalledDuringMomentum,
     setOnEndReachedCalledDuringMomentum,
   ] = useState(true);
+  const [selectedService, setSelectedService] = useState(null);
+  const [instances, setInstances] = useState(null);
+
+  useEffect(() => {
+    if (selectedService) {
+      getInstances();
+    }
+  }, [selectedService]);
+
+  useEffect(() => {
+    if (data) {
+      setIsLoading(false);
+    }
+  }, [data]);
 
   const renderItems = useCallback(
-    ({ item, index }) => (
-      <ItemApplication
-        item={item}
-        key={item.code}
-        // onClick={onClickService}
-        // isSelected={getSelectedService(item)}
-        //   onClick={onOpenPlace}
-        //   limitedDescription
-        // onShowProfile={onShowProfile}
-        // onShowPublicationImages={onShowPublicationImages}
-      />
-    ),
+    ({ item, index }) => <ItemApplication item={item} key={generateKey()} />,
     []
   );
 
-  const keyExtractor = useCallback((item) => item.code, []);
+  const keyExtractor = useCallback((item) => generateKey(), []);
 
   const onEndReached = () => {};
 
-  const onRefreshData = () => {};
+  const onRefreshData = () => {
+    if (selectedService) {
+      getInstances();
+    }
+  };
 
-//   const onClickService = (service) => {
-//     const data = [...selectedServices];
-//     const index = data?.findIndex((cat) => cat.code === service.code);
-//     if (index !== -1) {
-//       data.splice(index, 1);
-//     } else {
-//       data.push(service);
-//     }
-//     setSelectedServices(data);
-//   };
+  const onSelectService = (value) => {
+    setSelectedService(value);
+  };
 
-//   const getSelectedService = useCallback(
-//     (service) =>
-//       selectedServices.findIndex((cat) => cat.code === service.code) !== -1,
-//     [selectedServices]
-//   );
+  const getInstances = async () => {
+    try {
+      setIsLoading(true);
+      const response = await GetInstances(selectedService.id);
+      const { success, data } = response.data;
+      if (success) {
+        setData(data);
+      }
+    } catch (error) {
+      console.log({ error });
+      setIsLoading(false);
+    }
+  };
 
   return (
     <>
-      {isLoading ? (
-        <FullLoadingContainer />
-      ) : (
-        <FlatList
-          style={{ backgroundColor: APP_COLORS.LIGHT_COLOR.color, flex: 1, marginTop: 1, }}
-          disableIntervalMomentum
-          data={data || []}
-          renderItem={renderItems}
-          keyExtractor={keyExtractor}
-          maxToRenderPerBatch={6}
-          onEndReachedThreshold={0.5}
-          updateCellsBatchingPeriod={100}
-          initialNumToRender={6}
-          onMomentumScrollBegin={() => {
-            setOnEndReachedCalledDuringMomentum(false);
-          }}
-          refreshControl={
-            <RefreshControl
-              refreshing={isRefreshing}
-              onRefresh={onRefreshData}
-              tintColor={APP_COLORS.PRIMARY_COLOR.color}
-              progressBackgroundColor={APP_COLORS.PRIMARY_COLOR.color}
-              colors={[APP_COLORS.PRIMARY_COLOR.color]}
+      <FlatList
+        style={{ backgroundColor: "transparent", flex: 1 }}
+        disableIntervalMomentum
+        data={selectedService && !isLoading && data?.length ? data : []}
+        renderItem={renderItems}
+        keyExtractor={keyExtractor}
+        maxToRenderPerBatch={10}
+        onEndReachedThreshold={0.5}
+        updateCellsBatchingPeriod={100}
+        initialNumToRender={10}
+        onMomentumScrollBegin={() => {
+          setOnEndReachedCalledDuringMomentum(false);
+        }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefreshData}
+            tintColor={APP_COLORS.PRIMARY_COLOR.color}
+            progressBackgroundColor={APP_COLORS.PRIMARY_COLOR.color}
+            colors={[APP_COLORS.PRIMARY_COLOR.color]}
+          />
+        }
+        onRefresh={onRefreshData}
+        onEndReached={() => onEndReached()}
+        refreshing={isRefreshing}
+        showsVerticalScrollIndicator={false}
+        ListFooterComponent={
+          isRetrievingData && (
+            <ActivityIndicator
+              size="small"
+              color={APP_COLORS.YELLOW_COLOR.color}
             />
-          }
-          onRefresh={onRefreshData}
-          onEndReached={() => onEndReached()}
-          refreshing={isRefreshing}
-          showsVerticalScrollIndicator={false}
-          ListFooterComponent={
-            isRetreivingData && (
-              <ActivityIndicator
-                size="small"
-                color={APP_COLORS.YELLOW_COLOR.color}
-              />
-            )
-          }
-          ListHeaderComponent={<View style={{ marginTop: 10}}>
-
-          </View>}
-        />
+          )
+        }
+        ListHeaderComponent={
+          <Services
+            onSelectService={onSelectService}
+            selectedService={selectedService}
+            data={services}
+          />
+        }
+      />
+      {selectedService === null && (
+        <View
+          style={{
+            flex: 1.5,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{}}>
+            <MaterialCommunityIcons
+              name="gauge-empty"
+              size={75}
+              color={APP_COLORS.SECONDARY_COLOR.color}
+            />
+          </Text>
+          <Text style={{}}>Séléctionner un service.</Text>
+        </View>
       )}
+      {!isLoading && selectedService !== null && !data?.length && (
+        <View
+          style={{
+            flex: 1.5,
+            alignItems: "center",
+          }}
+        >
+          <Text style={{}}>
+            <AntDesign name="exclamation"  size={75}
+              color={APP_COLORS.PRIMARY_COLOR.color} />
+          </Text>
+          <Text style={{}}>Aucune donnée remontée sur cette période.</Text>
+        </View>
+      )}
+      {isLoading && <FullLoadingContainer />}
     </>
   );
 }

@@ -1,34 +1,39 @@
-import { View, Text } from "react-native";
-import React, { useState } from "react";
+import { View, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
 import { SAFE_AREA_VIEW } from "../../../styling/screnn";
-import { SafeAreaView } from "react-native";
-import HeaderDashboard from "../../../components/headers/HeaderDashboard";
-import TabBarCategorisation from "../../../components/tabbar/TabBarCategorisation";
+
 import BottomModal from "../../../components/modals/BottomModal";
 import { APP_COLORS } from "../../../styling/colors";
 import ServicesFilters from "../../../components/filters/ServicesFilters";
-import { TABS } from "../../../utils/system";
-import Monitoring from "./Monitoring";
 import DefaultInput from "../../../components/DefaultInput";
 import HeaderAlarms from "../../../components/headers/HeaderAlarms";
-import Statistiques from "./Statistiques";
 import { BUTTON_STYLE } from "../../../styling/button";
-import { TouchableOpacity } from "react-native";
 import RasLoading from "../../../components/loaders/RasLoading";
+import { SafeAreaView } from "react-native-safe-area-context";
+import ApplicationsList from "../../../components/lists/ApplicationsList";
+import { GetServices } from "../../../api";
 
 export default function Dashboard({ navigation, route }) {
   const [activeTab, setActiveTab] = useState(0);
   const [showFilterServices, setShowFilterServices] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [services, setServices]= useState(null);
+
+  useEffect(() => {
+    getServices();
+  }, []);
+
+  useEffect(() => {
+    if (services?.length) {
+      setIsLoading(false);
+    }
+  }, [services]);
 
   const onShowFilterService = () => {
     setShowFilterServices(true);
   };
 
-  const onChangeTab = ({ position }) => {
-    setActiveTab(position);
-  };
 
   const onSearchService = () => {
     setShowSearch(false);
@@ -60,13 +65,31 @@ export default function Dashboard({ navigation, route }) {
     </View>
   );
 
+  const getServices = async () => {
+    try {
+      const response = await GetServices();
+      const { success, data } = response.data;
+      if (success) {
+        setServices(data);
+      }
+    } catch (error) {
+      console.log({ error });
+
+    }
+  }
+
   return (
-    <SafeAreaView style={[SAFE_AREA_VIEW.container]}>
-      <HeaderAlarms onSearch={() => !isLoading && setShowFilterServices(true)} />
+    <SafeAreaView
+      style={[SAFE_AREA_VIEW.container]}
+      edges={["right", "left", "top"]}
+    >
+      <HeaderAlarms
+        onSearch={() => !isLoading && setShowFilterServices(true)}
+      />
       {isLoading ? (
-        <RasLoading text="Recherche... "/>
-      ): (
-        <Monitoring />
+        <RasLoading text="Chargement des services... " />
+      ) : (
+        <ApplicationsList navigation={navigation} services={services}/>
       )}
       <BottomModal
         onClose={() => setShowSearch(false)}
@@ -79,9 +102,11 @@ export default function Dashboard({ navigation, route }) {
       />
       <BottomModal
         onClose={() => setShowFilterServices(false)}
-        content={<ServicesFilters onClose={() => setShowFilterServices(false)}/>}
+        content={
+          <ServicesFilters onClose={() => setShowFilterServices(false)} />
+        }
         showModal={showFilterServices}
-        backgroundColor={APP_COLORS.WHITE_COLOR.color} //"rgba(255,255,255,0.95)"
+        backgroundColor={APP_COLORS.WHITE_COLOR.color}
         sliderBackgroundColor={APP_COLORS.PRIMARY_COLOR.color}
         borderWidth={2}
         borderColor={APP_COLORS.LIGHT_COLOR.color}

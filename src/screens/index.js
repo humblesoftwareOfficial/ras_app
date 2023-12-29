@@ -6,6 +6,7 @@ import { VIEWS_NAME } from "../utils/system";
 import Dashboard from "./Home/Dashboard";
 import Profile from "./Home/Profile";
 import Settings from "./Home/Settings";
+import { Platform } from "react-native";
 
 const Tabs = AnimatedTabBarNavigator();
 
@@ -16,12 +17,13 @@ export default ({ navigation }) => {
       tabBarOptions={{
         activeBackgroundColor: APP_COLORS.PRIMARY_COLOR.color,
         activeTintColor: APP_COLORS.WHITE_COLOR.color,
-        inactiveTintColor: APP_COLORS.BLACK_COLOR.color,
+        inactiveTintColor: APP_COLORS.WHITE_COLOR.color,
         showLabel: true,
         tabStyle: {
-          backgroundColor: "#FFF",
-          borderColor: APP_COLORS.TERTIARY_COLOR.color,
-          // borderTopWidth: 1,
+          backgroundColor: APP_COLORS.WHITE_COLOR.color,
+          // borderColor: APP_COLORS.TERTIARY_COLOR.color,
+          borderTopWidth: 1,
+          borderColor: "#ECECEC",
           elevation: 1,
         },
         style: {
@@ -32,8 +34,8 @@ export default ({ navigation }) => {
       appearance={{
         topPadding: 7,
         horizontalPadding: 10,
-        // whenActiveShow: "icon-only",
         whenInactiveShow: "icon-only",
+        bottomPadding: Platform.OS === "ios" && Platform.Version >= 17 ? 25 : 5,
       }}
     >
       <Tabs.Screen

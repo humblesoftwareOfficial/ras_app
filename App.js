@@ -1,4 +1,3 @@
-import { StatusBar } from "expo-status-bar";
 import { Image, StyleSheet, Text, View } from "react-native";
 import { RootSiblingParent } from "react-native-root-siblings";
 import {
@@ -11,7 +10,18 @@ import { loadAsync, useFonts } from "expo-font";
 import Navigation from "./src/navigation";
 import WelcomPage from "./src/screens/Shared/WelcomePage";
 import { useEffect, useState } from "react";
-import { AntDesign, Entypo, EvilIcons, Feather, FontAwesome, Fontisto, Ionicons, MaterialCommunityIcons, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Entypo,
+  EvilIcons,
+  Feather,
+  FontAwesome,
+  Fontisto,
+  Ionicons,
+  MaterialCommunityIcons,
+  MaterialIcons,
+  SimpleLineIcons,
+} from "@expo/vector-icons";
 
 const theme = {
   ...DefaultTheme,
@@ -90,7 +100,6 @@ export default function App() {
     await Promise.all([...imageAssets, ...fontAssets]);
   };
 
-
   return (
     <PaperProvider theme={theme}>
       <RootSiblingParent>
@@ -102,12 +111,3 @@ export default function App() {
     </PaperProvider>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});

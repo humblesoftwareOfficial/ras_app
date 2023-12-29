@@ -45,7 +45,6 @@ export const ALARMS_DASHBOARD_STYLE = StyleSheet.create({
     padding: 5,
     justifyContent: "center",
     alignItems: "center",
-    // backgroundColor: "white"
   },
   left: {
     flex: 1,
@@ -58,6 +57,14 @@ export const ALARMS_DASHBOARD_STYLE = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     minWidth: Math.ceil(Dimensions.get("window").height / 20),
+    backgroundColor: "#FFF",
+    shadowOffset: {
+      width: 0,
+      height: 0.5,
+    },
+    shadowOpacity: 0.25,
+    elevation: 2,
+    shadowColor: "#B3B3B3",
   },
   right: {
     flexDirection: "row"
@@ -65,6 +72,6 @@ export const ALARMS_DASHBOARD_STYLE = StyleSheet.create({
   title: {
     color: APP_COLORS.BLACK_COLOR.color,
     fontFamily: FONTS.bold,
-    fontSize: 20,
+    // fontSize: 20,
   }
 })

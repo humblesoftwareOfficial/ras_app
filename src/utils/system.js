@@ -67,11 +67,11 @@ export const getStatusLabel = (status = "") => {
       case EApplicationStatus.success:
         return "Réussi";
       case EApplicationStatus["service-failure"]:
-        return "Echec service";
+        return "E.Service";
       case EApplicationStatus["internal-failure"]:
-        return "Echec interne";
+        return "E.Interne";
       default:
-        return APP_COLORS.WHITE_COLOR.color;
+        return APP_COLORS.BLACK_COLOR.color;
     }
   } catch (error) {}
 };

@@ -4,8 +4,9 @@ import { ActivityIndicator } from "react-native";
 
 import FullLoadingContainer from "../loaders/FullLoadingContainer";
 import { APP_COLORS } from "../../styling/colors";
-import FilterServiceCard from "../cards/services";
+
 import { RefreshControl } from "react-native";
+import FilterServiceCard from "../cards/services/filter";
 
 const DATA = [
   {

@@ -19,6 +19,9 @@ export const APP_COLORS = StyleSheet.create({
   BLACK_COLOR: {
     color: "#000",
   },
+  BLACK_LIGHT_COLOR: {
+    color: "#444141",
+  },
   GRAY_COLOR: {
     color: "#CCCCCC"
   },
