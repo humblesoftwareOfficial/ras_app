@@ -22,8 +22,7 @@ export const STATISTICS_STYLE = StyleSheet.create({
     fontSize: 24,
     // color: "#FFF"
   },
-  recap: {
-    flexDirection: "row", 
+  recap_container: {
     backgroundColor: "#000",
     padding: 10,
     margin: 10,
@@ -35,6 +34,13 @@ export const STATISTICS_STYLE = StyleSheet.create({
     elevation: 4,
     // borderWidth: 1,
     borderColor: "#DADADA"
+  },
+  recap: {
+    flexDirection: "row", 
+   
+    // padding: 10,
+    // margin: 10,
+    
   },
   stats_recap: {
     flex: 1,
@@ -74,7 +80,7 @@ export const STATISTICS_STYLE = StyleSheet.create({
   },
   float_icon: {
     position: "absolute",
-    
+
   }
 });
 

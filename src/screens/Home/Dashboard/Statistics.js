@@ -14,6 +14,7 @@ import { generateKey, getStatusCount } from "../../../utils";
 import { EApplicationStatus } from "../../../utils/system";
 import StatisticCard from "../../../components/cards/applications/statistics";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
+import BackButton from "../../../components/buttons/BackButton";
 
 export default function Statistics({ navigation, route }) {
   const [data, setData] = useState(null);
@@ -64,15 +65,20 @@ export default function Statistics({ navigation, route }) {
             },
           ]}
         >
-          <Text style={{ color: "#FFF"}}>{value}</Text>
+          <Text style={{ color: "#FFF" }}>{value}</Text>
         </View>
       </View>
-      <View style={[STATISTICS_STYLE.float_icon, {
-              bottom: 15,
-              // left: 0
-            }]}>
-              <AntDesign name="dashboard" size={24} color="rgba(255,255,255, 0.2)" />
-            </View>
+      <View
+        style={[
+          STATISTICS_STYLE.float_icon,
+          {
+            bottom: 15,
+            // left: 0
+          },
+        ]}
+      >
+        <AntDesign name="dashboard" size={24} color="rgba(255,255,255, 0.2)" />
+      </View>
     </View>
   );
 
@@ -87,59 +93,73 @@ export default function Statistics({ navigation, route }) {
     }
   };
 
-  const getBarHeight = (value = 0) => (
-    !value ? WIDTH_INNER_BAR : (
-      (value * MAX_INNER_BAR_HEIGHT /
-      data.tests?.length) + WIDTH_INNER_BAR
-    )
-  )
+  const getBarHeight = (value = 0) =>
+    !value
+      ? WIDTH_INNER_BAR
+      : (value * MAX_INNER_BAR_HEIGHT) / data.tests?.length + WIDTH_INNER_BAR;
 
-  const renderStatisticsData = () => (
+  const renderStatisticsData = () =>
     (data?.tests || []).map((item, _) => (
-      <StatisticCard key={generateKey()} data={item}/>
-    ))
-  )
+      <StatisticCard key={generateKey()} data={item} />
+    ));
 
   return (
     <SafeAreaView
-      style={[SAFE_AREA_VIEW.container, ]}
+      style={[SAFE_AREA_VIEW.container]}
       edges={["right", "left", "top"]}
     >
       {isLoading ? (
         <RasLoading text="Chargement des données... " />
       ) : (
-        <ScrollView
-          style={STATISTICS_STYLE.container}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-        >
-          <View style={STATISTICS_STYLE.header}>
-            <Text style={STATISTICS_STYLE.title}>{data.name}</Text>
-          </View>
-          <View style={STATISTICS_STYLE.recap}>
-            {renderRecapStatistic(
-              "rgba(246, 124, 35, 0.3)",
-              APP_COLORS.PRIMARY_COLOR.color,
-              data.tests?.length,
-              "Tests",
-              MAX_INNER_BAR_HEIGHT
-            )}
-            {renderRecapStatistic(
-              "rgba(16, 161, 157, 0.3)",
-              APP_COLORS.SECONDARY_COLOR.color,
-              statusCount[EApplicationStatus.success],
-              "Réussis",
-              statusCount[EApplicationStatus.success] === data.tests?.length ? MAX_INNER_BAR_HEIGHT : getBarHeight(statusCount[EApplicationStatus.success])
-            )}
-            {renderRecapStatistic(
-              "rgba(244, 71, 36, 0.3)",
-              APP_COLORS.RED_COLOR.color,
-              renderStatusFailed(),
-              "Echoués",
-              renderStatusFailed() === data.tests?.length ? MAX_INNER_BAR_HEIGHT : getBarHeight(renderStatusFailed())
-            )}
+        <>
+          <View style={{ flexDirection: "row", marginLeft: 10}}>
             
-            {/* <View style={[STATISTICS_STYLE.float_icon, {
+            <BackButton onClick={() => navigation.goBack()}/>
+            <View style={{ flex: 1 }}></View>
+          </View>
+          <ScrollView
+            style={STATISTICS_STYLE.container}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+          >
+            <View style={STATISTICS_STYLE.recap_container}>
+              <Text
+                style={{
+                  color: "white",
+                  textAlign: "center",
+                  fontWeight: "bold",
+                }}
+              >
+                • MONITORING
+              </Text>
+              <View style={STATISTICS_STYLE.recap}>
+                {renderRecapStatistic(
+                  "rgba(246, 124, 35, 0.3)",
+                  APP_COLORS.PRIMARY_COLOR.color,
+                  data.tests?.length,
+                  "Tests",
+                  MAX_INNER_BAR_HEIGHT
+                )}
+                {renderRecapStatistic(
+                  "rgba(16, 161, 157, 0.3)",
+                  APP_COLORS.SECONDARY_COLOR.color,
+                  statusCount[EApplicationStatus.success],
+                  "Réussis",
+                  statusCount[EApplicationStatus.success] === data.tests?.length
+                    ? MAX_INNER_BAR_HEIGHT
+                    : getBarHeight(statusCount[EApplicationStatus.success])
+                )}
+                {renderRecapStatistic(
+                  "rgba(244, 71, 36, 0.3)",
+                  APP_COLORS.RED_COLOR.color,
+                  renderStatusFailed(),
+                  "Echoués",
+                  renderStatusFailed() === data.tests?.length
+                    ? MAX_INNER_BAR_HEIGHT
+                    : getBarHeight(renderStatusFailed())
+                )}
+
+                {/* <View style={[STATISTICS_STYLE.float_icon, {
               right: 10,
               top: 18,
               bottom: 0
@@ -165,12 +185,15 @@ export default function Statistics({ navigation, route }) {
             }]}>
               <Ionicons name="stats-chart-outline" size={24} color="rgba(255,255,255, 0.1)" />
             </View> */}
-          </View>
-          
-          <View style={STATISTICS_STYLE.tests}>
-            {renderStatisticsData()}
-          </View>
-        </ScrollView>
+              </View>
+            </View>
+            <View style={STATISTICS_STYLE.header}>
+              <Text style={STATISTICS_STYLE.title}>{data.name}</Text>
+            </View>
+            {/* <Text style={{ color: "black", textAlign: "center", fontWeight: "bold"}}>• RESULTATS DES TESTS </Text> */}
+            <View style={STATISTICS_STYLE.tests}>{renderStatisticsData()}</View>
+          </ScrollView>
+        </>
       )}
     </SafeAreaView>
   );
