@@ -11,3 +11,20 @@ export const generateKey = () => {
   }
   return key;
 };
+
+export const getStatusCount = (data = []) => {
+  try {
+    const countByStatus = data.reduce((acc, obj) => {
+      const status = obj.status;
+      if (!acc[status]) {
+        acc[status] = 1;
+      } else {
+        acc[status]++;
+      }
+      return acc;
+    }, {});
+    return countByStatus;
+  } catch (error) {
+    return "";
+  }
+};

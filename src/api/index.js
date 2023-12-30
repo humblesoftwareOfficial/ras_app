@@ -2,7 +2,7 @@ import axios from "axios";
 
 let api = axios.create({
   // baseURL: "https://wedding-service-rbkvf5x6ka-uc.a.run.app/",
-  baseURL: "http://192.168.15.82:3000",
+  baseURL: "http://192.168.1.6:3000",
 });
 
 export const GetServices = async () => {

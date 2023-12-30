@@ -9,6 +9,7 @@ export const VIEWS_NAME = {
   Dashboard: "Dashboard",
   Profile: "Profile",
   Settings: "Settings",
+  Statistics: "Statistics",
 };
 
 export const ETABSLabel = {

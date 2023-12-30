@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import React, { useState } from "react";
 import { ITEM_APPLICATION_CARD_STYLE } from "../../../../styling/cards";
 import {
@@ -10,7 +10,7 @@ import { generateKey } from "../../../../utils";
 import ResultStatusPreviewCard from "./ResultStatusPreviewCard";
 import { APP_COLORS } from "../../../../styling/colors";
 
-const ItemApplication = ({ item }) => {
+const ItemApplication = ({ item, onClick }) => {
   // const [statusColor, setStatusColor] = useState(getStatusColor(item.status[0]));
 
   const renderResultsCheck = () =>
@@ -18,7 +18,7 @@ const ItemApplication = ({ item }) => {
       <ResultStatusPreviewCard key={generateKey()} value={value} />
     ));
   return (
-    <View style={[ITEM_APPLICATION_CARD_STYLE.container]}>
+    <TouchableOpacity style={[ITEM_APPLICATION_CARD_STYLE.container]} activeOpacity={0.7} onPress={() => onClick(item)}>
       <View style={ITEM_APPLICATION_CARD_STYLE.top}>
         {/* <View style={ITEM_APPLICATION_CARD_STYLE.left}>
           <View
@@ -76,7 +76,7 @@ const ItemApplication = ({ item }) => {
           </View>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 

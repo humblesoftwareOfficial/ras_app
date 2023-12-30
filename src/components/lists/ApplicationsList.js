@@ -7,7 +7,7 @@ import { APP_COLORS } from "../../styling/colors";
 
 import { RefreshControl } from "react-native";
 import ItemApplication from "../cards/applications/ItemApplication";
-import { EApplicationStatus } from "../../utils/system";
+import { EApplicationStatus, VIEWS_NAME } from "../../utils/system";
 import { View } from "react-native";
 import Services from "../../screens/Home/Dashboard/Services";
 import { AntDesign, MaterialCommunityIcons } from "@expo/vector-icons";
@@ -40,12 +40,12 @@ export default function ApplicationsList({ navigation, services = [] }) {
   }, [data]);
 
   const renderItems = useCallback(
-    ({ item, index }) => <ItemApplication item={item} key={generateKey()} />,
+    ({ item, index }) => <ItemApplication item={item} key={generateKey()} onClick={onShowAppResults}/>,
     []
   );
 
   const keyExtractor = useCallback((item) => generateKey(), []);
-
+  
   const onEndReached = () => {};
 
   const onRefreshData = () => {
@@ -53,6 +53,16 @@ export default function ApplicationsList({ navigation, services = [] }) {
       getInstances();
     }
   };
+
+  const onShowAppResults = (value) => {
+    try {
+      navigation.navigate(VIEWS_NAME.Statistics, {
+        data: value
+      });
+    } catch (error) {
+      
+    }
+  }
 
   const onSelectService = (value) => {
     setSelectedService(value);
