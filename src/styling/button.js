@@ -1,11 +1,15 @@
 import { StyleSheet } from "react-native";
 
 export const BUTTON_STYLE = StyleSheet.create({
-  button: {
-    margin: 5,
-    marginTop: 15,
+  container_button: {
     padding: 10,
     alignItems: "center",
-    borderRadius: 10,
+    justifyContent: "center"
+  },
+  button: {
+    alignItems: "center",
+  },
+  textButton: {
+    color: "white",
   },
 });

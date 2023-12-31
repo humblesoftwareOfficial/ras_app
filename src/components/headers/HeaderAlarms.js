@@ -7,12 +7,14 @@ import {
   MaterialCommunityIcons,
   SimpleLineIcons,
 } from "@expo/vector-icons";
-import NetInfo from '@react-native-community/netinfo';
+import NetInfo from "@react-native-community/netinfo";
 
 import { APP_COLORS } from "../../styling/colors";
+import { getInstancesIntervalTimeTranslation } from "../../utils";
 
 const ICON_SIZE = 18;
-export default function HeaderAlarms({ onSearch }) {
+
+export default function HeaderAlarms({ onSearch, interval }) {
   const [isConnected, setIsConnected] = useState(false);
   useEffect(() => {
     const unsubscribe = NetInfo.addEventListener((state) => {
@@ -31,10 +33,22 @@ export default function HeaderAlarms({ onSearch }) {
       </View>
       <View style={ALARMS_DASHBOARD_STYLE.right}>
         <TouchableOpacity
-          style={[ALARMS_DASHBOARD_STYLE.item]}
+          style={[
+            ALARMS_DASHBOARD_STYLE.item,
+            {
+              backgroundColor: APP_COLORS.WHITE_COLOR.color,
+            },
+          ]}
           onPress={onSearch}
         >
-          <FontAwesome5 name="search" size={ICON_SIZE} color="black" />
+          <Text
+            style={{ color: APP_COLORS.PRIMARY_COLOR.color, fontSize: 10 }}
+          >{`${getInstancesIntervalTimeTranslation(interval)} `}</Text>
+          <Ionicons
+            name="md-timer-outline"
+            size={ICON_SIZE + 5}
+            color={APP_COLORS.BLACK_COLOR.color}
+          />
         </TouchableOpacity>
         <TouchableOpacity
           style={[
@@ -46,7 +60,6 @@ export default function HeaderAlarms({ onSearch }) {
             },
           ]}
         >
-          {/* <SimpleLineIcons name="reload" size={ICON_SIZE} color="white" /> */}
           <MaterialCommunityIcons
             name={isConnected ? "web-check" : "web-cancel"}
             size={ICON_SIZE}

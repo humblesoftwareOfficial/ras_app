@@ -1,4 +1,10 @@
-import { View, Text, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  Dimensions,
+} from "react-native";
 import React, { useEffect, useState } from "react";
 import { SAFE_AREA_VIEW } from "../../../styling/screnn";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -10,32 +16,51 @@ import {
   WIDTH_INNER_BAR,
 } from "../../../styling/statistics";
 import { APP_COLORS } from "../../../styling/colors";
-import { generateKey, getStatusCount } from "../../../utils";
+import {
+  generateKey,
+  getInstancesIntervalTimeTranslation,
+  getStatusCount,
+} from "../../../utils";
 import { EApplicationStatus } from "../../../utils/system";
 import StatisticCard from "../../../components/cards/applications/statistics";
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import BackButton from "../../../components/buttons/BackButton";
+import { ALARMS_DASHBOARD_STYLE } from "../../../styling/headers";
+import BottomModal from "../../../components/modals/BottomModal";
+import InstanceTimeIntervalFilter from "../../../components/filters/InstanceTimeIntervalFilter";
+import { useDidMountEffect } from "../../../utils/useDidMountEffect";
+import { GetInstances } from "../../../api";
+
+const MODAL_HEIGHT = Math.ceil(Dimensions.get("window").height / 2);
 
 export default function Statistics({ navigation, route }) {
-  const [data, setData] = useState(null);
+  const [scenario, setScenario] = useState(null);
+  const [selectedInterval, setSelectedInterval] = useState(route.params?.interval);
+  const [selectedService, setSelectedService] = useState(route.params?.service);
   const [isLoading, setIsLoading] = useState(true);
   const [statusCount, setStatusCount] = useState(
     getStatusCount(route.params?.data?.tests || [])
   );
+  const [showIntervalFilter, setShowIntervalFilter] = useState(false);
+  const [hasChanged, setHasChanged] = useState(false);
 
   useEffect(() => {
     if (!route.params?.data) {
       navigation.goBack();
     } else {
-      setData(route.params.data);
+      setScenario(route.params.data);
     }
   }, []);
 
   useEffect(() => {
-    if (data) {
+    if (scenario) {
       setIsLoading(false);
     }
-  }, [data]);
+  }, [scenario]);
+
+  useDidMountEffect(() => {
+    getInstances();
+  }, [selectedInterval])
 
   const renderRecapStatistic = (
     containerColor,
@@ -96,12 +121,38 @@ export default function Statistics({ navigation, route }) {
   const getBarHeight = (value = 0) =>
     !value
       ? WIDTH_INNER_BAR
-      : (value * MAX_INNER_BAR_HEIGHT) / data.tests?.length + WIDTH_INNER_BAR;
+      : (value * MAX_INNER_BAR_HEIGHT) / scenario.tests?.length + WIDTH_INNER_BAR;
 
   const renderStatisticsData = () =>
-    (data?.tests || []).map((item, _) => (
+    (scenario?.tests || []).map((item, _) => (
       <StatisticCard key={generateKey()} data={item} />
     ));
+
+    const getInstances = async () => {
+      try {
+        setIsLoading(true);
+        const payload = {
+          serviceID: selectedService.id,
+          interval: selectedInterval,
+          scenario: scenario.name
+        }
+        const response = await GetInstances(payload);
+        const { success, data } = response.data;
+        if (success) {
+          if (data?.length) {
+            setScenario(data[0]);
+          } else {
+            setScenario({
+              name: data.name,
+              tests: [],
+            })
+          }
+        }
+      } catch (error) {
+        console.log({ error });
+        setIsLoading(false);
+      }
+    };
 
   return (
     <SafeAreaView
@@ -112,10 +163,44 @@ export default function Statistics({ navigation, route }) {
         <RasLoading text="Chargement des données... " />
       ) : (
         <>
-          <View style={{ flexDirection: "row", marginLeft: 10}}>
-            
-            <BackButton onClick={() => navigation.goBack()}/>
-            <View style={{ flex: 1 }}></View>
+          <View
+            style={{
+              flexDirection: "row",
+              marginLeft: 10,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <BackButton onClick={() => navigation.goBack()} />
+            <View
+              style={{ flex: 1, flexDirection: "row-reverse", marginLeft: 10 }}
+            >
+              <TouchableOpacity
+                style={[
+                  ALARMS_DASHBOARD_STYLE.item,
+                  {
+                    backgroundColor: APP_COLORS.WHITE_COLOR.color,
+                    marginTop: 0,
+                    marginBottom: 7,
+                  },
+                ]}
+                onPress={() => setShowIntervalFilter(true)}
+              >
+                <Text
+                  style={{
+                    color: APP_COLORS.BLACK_COLOR.color,
+                    fontSize: 10,
+                  }}
+                >{`${getInstancesIntervalTimeTranslation(
+                  selectedInterval
+                )} `}</Text>
+                <Ionicons
+                  name="md-timer-outline"
+                  size={24}
+                  color={APP_COLORS.BLACK_COLOR.color}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
           <ScrollView
             style={STATISTICS_STYLE.container}
@@ -136,7 +221,7 @@ export default function Statistics({ navigation, route }) {
                 {renderRecapStatistic(
                   "rgba(246, 124, 35, 0.3)",
                   APP_COLORS.PRIMARY_COLOR.color,
-                  data.tests?.length,
+                  scenario.tests?.length,
                   "Tests",
                   MAX_INNER_BAR_HEIGHT
                 )}
@@ -145,7 +230,7 @@ export default function Statistics({ navigation, route }) {
                   APP_COLORS.SECONDARY_COLOR.color,
                   statusCount[EApplicationStatus.success],
                   "Réussis",
-                  statusCount[EApplicationStatus.success] === data.tests?.length
+                  statusCount[EApplicationStatus.success] === scenario.tests?.length
                     ? MAX_INNER_BAR_HEIGHT
                     : getBarHeight(statusCount[EApplicationStatus.success])
                 )}
@@ -154,7 +239,7 @@ export default function Statistics({ navigation, route }) {
                   APP_COLORS.RED_COLOR.color,
                   renderStatusFailed(),
                   "Echoués",
-                  renderStatusFailed() === data.tests?.length
+                  renderStatusFailed() === scenario.tests?.length
                     ? MAX_INNER_BAR_HEIGHT
                     : getBarHeight(renderStatusFailed())
                 )}
@@ -188,13 +273,31 @@ export default function Statistics({ navigation, route }) {
               </View>
             </View>
             <View style={STATISTICS_STYLE.header}>
-              <Text style={STATISTICS_STYLE.title}>{data.name}</Text>
+              <Text style={STATISTICS_STYLE.title}>•{scenario.name}</Text>
             </View>
-            {/* <Text style={{ color: "black", textAlign: "center", fontWeight: "bold"}}>• RESULTATS DES TESTS </Text> */}
             <View style={STATISTICS_STYLE.tests}>{renderStatisticsData()}</View>
           </ScrollView>
         </>
       )}
+      <BottomModal
+        onClose={() => setShowIntervalFilter(false)}
+        content={
+          <InstanceTimeIntervalFilter
+            onClose={() => setShowIntervalFilter(false)}
+            currentSelected={selectedInterval}
+            onSelectInterval={(value) => {
+              setShowIntervalFilter(false);
+              setSelectedInterval(value);
+            }}
+          />
+        }
+        showModal={showIntervalFilter}
+        backgroundColor="transparent"
+        sliderBackgroundColor="transparent"
+        borderColor={APP_COLORS.LIGHT_COLOR.color}
+        minHeight={MODAL_HEIGHT}
+        overlay="rgba(0, 0, 0, 0.7)"
+      />
     </SafeAreaView>
   );
 }

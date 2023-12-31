@@ -45,6 +45,7 @@ export const ALARMS_DASHBOARD_STYLE = StyleSheet.create({
     padding: 5,
     justifyContent: "center",
     alignItems: "center",
+    marginBottom: 10
   },
   left: {
     flex: 1,
@@ -52,8 +53,9 @@ export const ALARMS_DASHBOARD_STYLE = StyleSheet.create({
   },
   item: {
     margin: 2,
-    borderRadius: 10,
+    borderRadius: 5,
     padding: 5,
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
     minWidth: Math.ceil(Dimensions.get("window").height / 20),

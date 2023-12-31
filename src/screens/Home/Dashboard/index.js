@@ -1,10 +1,9 @@
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, Dimensions } from "react-native";
 import React, { useEffect, useState } from "react";
-import { SAFE_AREA_VIEW } from "../../../styling/screnn";
 
+import { SAFE_AREA_VIEW } from "../../../styling/screnn";
 import BottomModal from "../../../components/modals/BottomModal";
 import { APP_COLORS } from "../../../styling/colors";
-import ServicesFilters from "../../../components/filters/ServicesFilters";
 import DefaultInput from "../../../components/DefaultInput";
 import HeaderAlarms from "../../../components/headers/HeaderAlarms";
 import { BUTTON_STYLE } from "../../../styling/button";
@@ -12,13 +11,19 @@ import RasLoading from "../../../components/loaders/RasLoading";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ApplicationsList from "../../../components/lists/ApplicationsList";
 import { GetServices } from "../../../api";
+import { EInstanceIntervalTime } from "../../../utils";
+import InstanceTimeIntervalFilter from "../../../components/filters/InstanceTimeIntervalFilter";
+
+const MODAL_HEIGHT = Math.ceil(Dimensions.get("window").height / 2);
 
 export default function Dashboard({ navigation, route }) {
-  const [activeTab, setActiveTab] = useState(0);
-  const [showFilterServices, setShowFilterServices] = useState(false);
+  const [showIntervalFilter, setShowIntervalFilter] = useState(false);
   const [showSearch, setShowSearch] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [services, setServices]= useState(null);
+  const [services, setServices] = useState(null);
+  const [selectedInterval, setSelectedInterval] = useState(
+    EInstanceIntervalTime.Last_Hour
+  );
 
   useEffect(() => {
     getServices();
@@ -31,9 +36,8 @@ export default function Dashboard({ navigation, route }) {
   }, [services]);
 
   const onShowFilterService = () => {
-    setShowFilterServices(true);
+    setShowIntervalFilter(true);
   };
-
 
   const onSearchService = () => {
     setShowSearch(false);
@@ -74,9 +78,8 @@ export default function Dashboard({ navigation, route }) {
       }
     } catch (error) {
       console.log({ error });
-
     }
-  }
+  };
 
   return (
     <SafeAreaView
@@ -84,12 +87,17 @@ export default function Dashboard({ navigation, route }) {
       edges={["right", "left", "top"]}
     >
       <HeaderAlarms
-        onSearch={() => !isLoading && setShowFilterServices(true)}
+        onSearch={() => !isLoading && setShowIntervalFilter(true)}
+        interval={selectedInterval}
       />
       {isLoading ? (
         <RasLoading text="Chargement des services... " />
       ) : (
-        <ApplicationsList navigation={navigation} services={services}/>
+        <ApplicationsList
+          navigation={navigation}
+          services={services}
+          interval={selectedInterval}
+        />
       )}
       <BottomModal
         onClose={() => setShowSearch(false)}
@@ -101,44 +109,24 @@ export default function Dashboard({ navigation, route }) {
         borderColor={APP_COLORS.LIGHT_COLOR.color}
       />
       <BottomModal
-        onClose={() => setShowFilterServices(false)}
+        onClose={() => setShowIntervalFilter(false)}
         content={
-          <ServicesFilters onClose={() => setShowFilterServices(false)} />
+          <InstanceTimeIntervalFilter
+            onClose={() => setShowIntervalFilter(false)}
+            currentSelected={selectedInterval}
+            onSelectInterval={(value) => {
+              setShowIntervalFilter(false);
+              setSelectedInterval(value);
+            }}
+          />
         }
-        showModal={showFilterServices}
-        backgroundColor={APP_COLORS.WHITE_COLOR.color}
-        sliderBackgroundColor={APP_COLORS.PRIMARY_COLOR.color}
-        borderWidth={2}
+        showModal={showIntervalFilter}
+        backgroundColor="transparent"
+        sliderBackgroundColor="transparent"
         borderColor={APP_COLORS.LIGHT_COLOR.color}
+        minHeight={MODAL_HEIGHT}
+        overlay="rgba(0, 0, 0, 0.7)"
       />
     </SafeAreaView>
   );
-}
-
-{
-  /* <DefaultInput
-        placeholder="Search app.."
-        customTextAlign="left"
-        borderColor="transparent"
-      /> */
-}
-{
-  /* <HeaderDashboard onShowFilterService={onShowFilterService}/> */
-}
-{
-  /* <TabBarCategorisation
-        sections={TABS || []}
-        navigation={navigation}
-        onChangeTab={onChangeTab}
-        filterCategories={[]}
-      />
-      <BottomModal
-        onClose={() => setShowFilterServices(false)}
-        content={<ServicesFilters onClose={() => setShowFilterServices(false)}/>}
-        showModal={showFilterServices}
-        backgroundColor={APP_COLORS.WHITE_COLOR.color} //"rgba(255,255,255,0.95)"
-        sliderBackgroundColor={APP_COLORS.PRIMARY_COLOR.color}
-        borderWidth={2}
-        borderColor={APP_COLORS.LIGHT_COLOR.color}
-      /> */
 }

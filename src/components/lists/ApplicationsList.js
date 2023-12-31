@@ -15,7 +15,7 @@ import { GetInstances } from "../../api";
 import { generateKey } from "../../utils";
 
 
-export default function ApplicationsList({ navigation, services = [] }) {
+export default function ApplicationsList({ navigation, services = [], interval }) {
   const [isLoading, setIsLoading] = useState(false);
   const [data, setData] = useState(null);
   const [isRetrievingData, setIsRetrievingData] = useState(false);
@@ -31,7 +31,7 @@ export default function ApplicationsList({ navigation, services = [] }) {
     if (selectedService) {
       getInstances();
     }
-  }, [selectedService]);
+  }, [selectedService, interval]);
 
   useEffect(() => {
     if (data) {
@@ -57,7 +57,9 @@ export default function ApplicationsList({ navigation, services = [] }) {
   const onShowAppResults = (value) => {
     try {
       navigation.navigate(VIEWS_NAME.Statistics, {
-        data: value
+        data: value,
+        interval,
+        service: selectedService,
       });
     } catch (error) {
       
@@ -71,7 +73,11 @@ export default function ApplicationsList({ navigation, services = [] }) {
   const getInstances = async () => {
     try {
       setIsLoading(true);
-      const response = await GetInstances(selectedService.id);
+      const payload = {
+        serviceID: selectedService.id,
+        interval,
+      }
+      const response = await GetInstances(payload);
       const { success, data } = response.data;
       if (success) {
         setData(data);

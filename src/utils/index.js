@@ -28,3 +28,26 @@ export const getStatusCount = (data = []) => {
     return "";
   }
 };
+
+export const EInstanceIntervalTime = {
+  Last_Hour : 'Last_Hour',
+  Last_Half_Hour : 'Last_Half_Hour',
+  Last_Quarter_Hour : 'Last_Quarter_Hour',
+}
+
+export const getInstancesIntervalTimeTranslation = (value = "") => {
+  try {
+    switch (value) {
+      case EInstanceIntervalTime.Last_Hour:
+        return 'Dernière Heure';
+        case EInstanceIntervalTime.Last_Half_Hour:
+        return 'Dernière Démi-Heure';
+        case EInstanceIntervalTime.Last_Quarter_Hour:
+        return "Dernier Quart d'heure";
+      default:
+        return "";
+    }
+  } catch (error) {
+    return "";
+  }
+}
